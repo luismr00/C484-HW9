@@ -7,6 +7,7 @@ $(function() { // Makes sure that your function is called once all the DOM eleme
     $('.treat-button').click(clickedTreatButton);
     $('.play-button').click(clickedPlayButton);
     $('.exercise-button').click(clickedExerciseButton);
+    $('.tease-button').click(clickedTeaseButton);
   
 
   
@@ -14,23 +15,100 @@ $(function() { // Makes sure that your function is called once all the DOM eleme
   })
   
     // Add a variable "pet_info" equal to a object with the name (string), weight (number), and happiness (number) of your pet
-    var pet_info = {name:"My Pet Name", weight:"??", happiness:"??"};
-  
+    var pet_info = {name:"Raphael", weight: 0, happiness: 0, angry: 0};
+    var moodChange = true;
+    var teased = false;
+
     function clickedTreatButton() {
-      // Increase pet happiness
+      
+      // If angry level is NOT 0
+      if (pet_info.angry != 0) {
+        
+        // Decrease angry level
+        pet_info.angry--;
+      
+      } else {
+
+        // Increase pet happiness
+        pet_info.happiness++;
+
+      }
+
       // Increase pet weight
+      pet_info.weight++;
+
+      moodChange = true;
+      teased = false;
+
       checkAndUpdatePetInfoInHtml();
     }
     
     function clickedPlayButton() {
-      // Increase pet happiness
-      // Decrease pet weight
+
+      // If angry level is NOT 0
+      if (pet_info.angry != 0) {
+
+        moodChange = false;
+
+      } else {
+
+        // Increase pet happiness
+        pet_info.happiness++;  
+
+        // Decrease pet weight
+        pet_info.weight--;
+
+        moodChange = true;
+
+      }
+
+      teased = false;
+
       checkAndUpdatePetInfoInHtml();
     }
     
     function clickedExerciseButton() {
-      // Decrease pet happiness
-      // Decrease pet weight
+
+
+      // If angry level is NOT 0
+      if (pet_info.angry != 0) {
+        
+
+        moodChange = false;
+      
+      } else {
+
+        // Decrease pet happiness
+        pet_info.happiness--;
+
+        // Decrease pet weight
+        pet_info.weight--;
+
+        moodChange = true;
+
+      }
+
+      teased = false;
+
+      checkAndUpdatePetInfoInHtml();
+    }
+
+    function clickedTeaseButton() {
+
+      //increase angry level
+      if(pet_info.happiness === 0) {
+
+        pet_info.angry++;
+
+      } else {
+        //decrease pet happiness
+        pet_info.happiness--;    
+        
+      }
+
+      teased = true;
+      moodChange = true;
+
       checkAndUpdatePetInfoInHtml();
     }
   
@@ -41,6 +119,27 @@ $(function() { // Makes sure that your function is called once all the DOM eleme
     
     function checkWeightAndHappinessBeforeUpdating() {
       // Add conditional so if weight is lower than zero, set it back to zero
+
+      if (pet_info.weight === -1)
+        pet_info.weight = 0;
+
+      if (pet_info.happiness === -1) 
+        pet_info.happiness = 0;
+
+      if (pet_info.angry === -1) 
+        pet_info.angry = 0;
+
+      if ((pet_info.weight === 0) && (pet_info.happiness === 0) && (pet_info.angry === 0))
+        $('.mood').text('Pet is sad. :(');
+      else if (teased === true)
+        $('.mood').text("Pet is getting annoyed");
+      else if (moodChange === false)
+        $('.mood').text('Pet is still angry and not in the mood. Try something else.');
+      else if (pet_info.angry != 0)
+        $('.mood').text('Pet is currently Angry. Try to change his mood.');
+      else 
+        $('.mood').text('Pet is pretty happy. :)');
+
     }
     
     // Updates your HTML with the current values in your pet_info object
@@ -48,5 +147,53 @@ $(function() { // Makes sure that your function is called once all the DOM eleme
       $('.name').text(pet_info['name']);
       $('.weight').text(pet_info['weight']);
       $('.happiness').text(pet_info['happiness']);
+      $('.tease').text(pet_info['angry']);
+
+      if (pet_info.angry != 0)
+        $('.pet-image').attr('src', './RavenBigAngry.jpg');
+      else
+        $('.pet-image').attr('src', './RavenBig.jpg');
+
+      if (pet_info.weight >= 15 && pet_info.weight < 30) {
+        $('.pet-image').css('height', '500px');
+        $('.status').css('max-width', '500px');
+        // $('.mood').text('Pet is pretty happy but could lose some weight.');
+
+      } 
+      else if (pet_info.weight >= 30) {
+        $('.pet-image').css('height', '800px');
+        $('.status').css('max-width', '800px');
+        // $('.mood').text('Pet is huge. Seriously get him to exercise.');
+      }
+
+
+      if (pet_info.angry === 20 && pet_info.weight < 30)
+        gameover();
+      else if (pet_info.angry === 20 && pet_info.weight >= 30)
+        rampage();
+    }
+
+    function gameover() {
+      const gameover = new Audio('./gameover.mp3');
+      gameover.play();
+      $('.pet-image').hide();
+      $('.dashboard').hide();
+      $('.mood').text('GameOver. Your pet ran away.');
+      $('.pet-image-container').css({'float': 'none', 'margin': '0 40%'});
+
+    }
+
+    function rampage() {
+      const rampage = new Audio('./rampage.mp3');
+      rampage.play();
+      $('.pet-image').css('height', '800px');
+      $('.dashboard').hide();
+      $('.mood').text('GameOver. Your pet went on a rampage trying to destroy the world.');
+      $('.status').css('max-width', '800px');
+      $('.pet-image-container').css({'float': 'none', 'padding': 'none', 'margin': '0 auto', 'width': '50%'});
+
     }
   
+
+    // Clean up code and add fat/overweight messages
+    //comment all code once done, else you might get knocked out points
